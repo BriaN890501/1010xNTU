@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8 ">
+    <meta name="viewport " content="width=device-width, initial-scale=1.0 ">
+    <meta http-equiv="X-UA-Compatible " content="ie=edge ">
+    <title>選擇設定檔</title>
+    <link rel="stylesheet" href="/static/setting_and_import.css">
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="{% url 'home' %}">使用說明</a>
+        <a href="{% url 'settings' %}">設定檔</a>
+        <a href="{% url 'imports' %}">選擇設定檔</a>
+        <a href="{% url 'importFile' %}">匯入檔案</a>
+        <a href="{% url 'summary' %}">結果預覽</a>
+    </div>
+    <div id="header">
+        <h1><img src="/static/logo.png" width=10% height=10%>客林存貨預測系統</h1>
+    </div>
+    <div id="choice">
+        <form action="" method="post">
+            {% csrf_token %}
+            <select name="Name" placeholder="設定檔名稱" onchange="this.form.submit()">
+                <option>選擇設定檔</option>
+                {% for entry in items %}
+                    <option value="{{ entry.Name }}">{{ entry.Name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <br>
+        <span id="block_title">目前預測方法: {{ method_name }}</span>
+        <br>
+        <br>
+        <br>
+        <div id="current">
+            {% for item in current_method %}
+            <span>{{ item }}</span>
+            <br> {% endfor %}
+        </div>
+    </div>
+
+</body>

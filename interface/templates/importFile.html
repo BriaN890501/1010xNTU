@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8 ">
+    <meta name="viewport " content="width=device-width, initial-scale=1.0 ">
+    <meta http-equiv="X-UA-Compatible " content="ie=edge ">
+    <title>匯入檔案</title>
+
+    <link rel="stylesheet" href="/static/setting_and_import.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        function loadCSV() {
+            var fileToLoad = document.getElementById("loadSales").files[0];
+
+            var fileReader = new FileReader();
+            fileReader.onload = function(fileLoadedEvent) {
+                var data = new Uint8Array(fileLoadedEvent.target.result);
+                var workbook = XLSX.read(data, {
+                    type: 'array'
+                });
+                var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                // header: 1 instructs xlsx to create an 'array of arrays'
+                var result = XLSX.utils.sheet_to_json(firstSheet, {
+                    header: 1
+                });
+
+                column_L = result.length
+                row_L = result[0].length
+                var startdate = result[1][4];
+                var enddate = result[1][row_L - 1];
+                // data preview
+                var output = document.getElementById("sizeResult");
+                output.innerHTML = "<br> 商品數: " + (column_L - 2).toString() + " 預測區間:" + startdate + "~" + enddate;
+
+
+
+            };
+            fileReader.readAsArrayBuffer(fileToLoad);
+        }
+
+        function showStats() {
+            var fileToLoad = document.getElementById("loadSales").files[0];
+
+            var fileReader = new FileReader();
+            fileReader.onload = function(fileLoadedEvent) {
+                var data = new Uint8Array(fileLoadedEvent.target.result);
+                var workbook = XLSX.read(data, {
+                    type: 'array'
+                });
+                var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                // header: 1 instructs xlsx to create an 'array of arrays'
+                var result = XLSX.utils.sheet_to_json(firstSheet, {
+                    header: 1
+                });
+
+                column_L = result.length
+                row_L = result[0].length
+                total_month = result[1].length - 4
+                var name = document.getElementById("inputGDSNO").value;
+                if (name != '') {
+                    var name_pos = 0;
+                    var found = false;
+
+                    var targetColumn = [];
+                    for (var i = 2; i < column_L; i++) {
+                        if (result[i][0] == name) {
+                            targetColumn = result[i].slice(4)
+                            found = true;
+                            break;
+                        }
+                    }
+                    for (var i = 0; i < targetColumn.length; i++) {
+                        if (targetColumn[i] === undefined) {
+                            targetColumn[i] = 0;
+                        }
+                    }
+                    if (targetColumn.length < total_month) {
+                        extend = new Array(total_month - targetColumn.length).fill(0);
+                        targetColumn = targetColumn.concat(extend);
+                    }
+
+                    Array.prototype.SumArray = function(arr) {
+                        var sum = [];
+                        if (arr != null && this.length == arr.length) {
+                            for (var i = 0; i < arr.length; i++) {
+                                sum.push(this[i] + arr[i]);
+                            }
+                        }
+
+                        return sum;
+                    }
+
+                    var Clim = [];
+                    var Vitel = [];
+                    Clim = targetColumn.slice(0, total_month / 2);
+                    Vitel = targetColumn.slice(total_month / 2);
+
+                    targetColumn = Clim.SumArray(Vitel);
+
+                    if (found) {
+                        var table = document.createElement('table');
+                        table.setAttribute('border', '1');
+                        table.setAttribute('width', '100%')
+                        var row1 = table.insertRow(0);
+                        var header = ["過去3個月平均銷量", "過去12個月平均銷量", "去年同期平均銷量"];
+                        //過去3個月平均
+                        var avg3 = 0;
+                        for (var i = targetColumn.length - 3; i < targetColumn.length; i++) {
+                            avg3 += parseFloat(targetColumn[i]);
+                        }
+                        avg3 = Math.round((avg3 / 3 + Number.EPSILON) * 100) / 100;
+                        //過去12個月平均
+                        var avg12 = 0;
+                        for (var i = targetColumn.length - 12; i < targetColumn.length; i++) {
+                            avg12 += parseFloat(targetColumn[i]);
+                        }
+                        avg12 = Math.round((avg12 / 12 + Number.EPSILON) * 100) / 100;
+                        //去年同期平均
+                        var avg_last = 0;
+                        for (var i = targetColumn.length - 12; i < targetColumn.length - 6; i++) {
+                            avg_last += parseFloat(targetColumn[i]);
+                        }
+                        avg_last = Math.round((avg_last / 6 + Number.EPSILON) * 100) / 100;
+
+                        var value = [avg3, avg12, avg_last];
+                        for (j = 0; j < 3; j++) {
+                            var text = document.createTextNode(header[j]);
+                            var cell = row1.insertCell(j);
+                            cell.setAttribute('align', 'center')
+                            cell.appendChild(text);
+                        }
+                        var row2 = table.insertRow(1);
+                        for (j = 0; j < 3; j++) {
+                            var text = document.createTextNode(value[j]);
+                            var cell = row2.insertCell(j);
+                            cell.setAttribute('align', 'center')
+                            cell.appendChild(text);
+                        }
+                        if (!document.getElementById("table")) {
+                            document.getElementById("Stats").innerHTML = '<span id="table"></span>'
+                            document.getElementById("table").appendChild(table);
+                        }
+
+
+
+                    } else {
+                        document.getElementById("Stats").innerHTML = "查無貨號"
+                    }
+
+                } else {
+                    document.getElementById("Stats").innerHTML = "請輸入貨號"
+
+                }
+            };
+            fileReader.readAsArrayBuffer(fileToLoad);
+        }
+    </script>
+
+
+
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="{% url 'home' %}">使用說明</a>
+        <a href="{% url 'settings' %}">設定檔</a>
+        <a href="{% url 'imports' %}">選擇設定檔</a>
+        <a href="{% url 'importFile' %}">匯入檔案</a>
+        <a href="{% url 'summary' %}">結果預覽</a>
+    </div>
+    <div id="header">
+        <h1><img src="/static/logo.png" width=10% height=10%>客林存貨預測系統</h1>
+    </div>
+    <div id="choice">
+        <span id="block_title">匯入銷售紀錄</span>
+        <br>
+        <br>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" id="loadSales" accept=".xlsx" name="file_upload">
+            <button type="button" onclick="loadCSV()">顯示基本資料</button>
+            <span id="sizeResult"></span>
+            <br>
+            <br>
+            <span id="block_title">商品統計</span>
+            <br>
+            <span>貨號 : </span>
+            <input id="inputGDSNO"></input>
+            <button type="button" onclick="showStats()">統計</button>
+            <br>
+            <span id="Stats"></span>
+            <br>
+            <input type="submit" value={{message}}>
+        </form>
+    </div>
+</body>

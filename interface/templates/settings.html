@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8 ">
+    <meta name="viewport " content="width=device-width, initial-scale=1.0 ">
+    <meta http-equiv="X-UA-Compatible " content="ie=edge ">
+    <title>設定檔</title>
+
+
+
+    <link rel="stylesheet" href="/static/setting_and_import.css">
+
+    <script type="text/javascript">
+        function checkbox() {
+            //methods check boxes
+            var checkboxes = document.getElementsByName('method');
+            var checkboxesChecked = [];
+            // loop over them all
+            for (var i = 0; i < checkboxes.length; i++) {
+                // And stick the checked ones onto an array...
+                if (checkboxes[i].checked) {
+                    checkboxesChecked.push(checkboxes[i].value);
+                }
+            }
+            // show checked boxes value
+            document.getElementById("show").innerHTML = '';
+            var counter = 0;
+            for (var i = 0; i < checkboxes.length; i++) {
+                // add checked value to html element with custom delimiter
+                if (typeof checkboxesChecked[i] != 'undefined') {
+
+                    document.getElementById("show").innerHTML += checkboxesChecked[i];
+                    document.getElementById("show").innerHTML += " / ";
+                }
+                //document.getElementById("show").innerHTML -= " / ";
+            }
+
+
+        }
+
+        function toggle(source) {
+            // select all
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i] != source) {
+                    checkboxes[i].checked = source.checked;
+                }
+            }
+        }
+    </script>
+
+
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="{% url 'home' %}">使用說明</a>
+        <a href="{% url 'settings' %}">設定檔</a>
+        <a href="{% url 'imports' %}">選擇設定檔</a>
+        <a href="{% url 'importFile' %}">匯入檔案</a>
+        <a href="{% url 'summary' %}">結果預覽</a>
+    </div>
+    <div id="header">
+        <h1><img src="/static/logo.png" width=10% height=10%>客林存貨預測系統</h1>
+    </div>
+    <div id="choice">
+        <span id="block_title">選擇預測方法 : </span>
+        <br>
+        <form action="" method="post">
+            {% csrf_token %}
+            <table id="choices">
+                <tr>
+                    <td>
+                        <label class="container"> 移動平均 + 季節性  
+                <input type="checkbox" name="method" id="MA_S" onClick="checkbox();" value="移動平均 + 季節性">
+                <span class="checkmark"></span>
+            </label>
+                    </td>
+
+                    <td>
+                        <label class="container"> 一次指數平滑 + 季節性  
+                    <input type="checkbox" name="method" id="SE_S" onClick="checkbox();" value="一次指數平滑 + 季節性">
+                    <span class="checkmark"></span>
+                </label>
+                    </td>
+
+                    <td>
+                        <label class="container"> 二次指數平滑 + 季節性  
+                        <input type="checkbox" name="method" id="DE_S" onClick="checkbox();" value="二次指數平滑 + 季節性">
+                        <span class="checkmark"></span>
+                    </label>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>
+                        <label class="container"> 移動平均(無季節性)  
+                <input type="checkbox" name="method" id="MA_NS" onClick="checkbox();" value="移動平均(無季節性)">
+                <span class="checkmark"></span>
+            </label>
+                    </td>
+
+                    <td>
+                        <label class="container"> 一次指數平滑(無季節性)  
+                    <input type="checkbox" name="method" id="SE_NS" onClick="checkbox();" value="一次指數平滑(無季節性)">
+                    <span class="checkmark"></span>
+                </label>
+                    </td>
+
+                    <td>
+                        <label class="container"> 二次指數平滑(無季節性)  
+                        <input type="checkbox" name="method" id="DE_NS" onClick="checkbox();" value="二次指數平滑(無季節性)">
+                        <span class="checkmark"></span>
+                    </label>
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>
+                        <label class="container">全選
+            <input type="checkbox"  onClick="toggle(this);checkbox();" >
+            <span class="checkmark"></span>
+        </label>
+                    </td>
+
+                </tr>
+            </table>
+            <br>
+            <span id="block_title">已選擇預測方法 : </span>
+            <p id="show"></p>
+            <input name="Name" placeholder="設定檔名稱" required>
+            <input type="submit" value="儲存">
+        </form>
+        <br>
+
+
+    </div>
+
+
+
+</body>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8 ">
+    <meta name="viewport " content="width=device-width, initial-scale=1.0 ">
+    <meta http-equiv="X-UA-Compatible " content="ie=edge ">
+    <title>首頁</title>
+    <link rel="stylesheet" href="/static/setting_and_import.css">
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="{% url 'home' %}">使用說明</a>
+        <a href="{% url 'settings' %}">設定檔</a>
+        <a href="{% url 'imports' %}">選擇設定檔</a>
+        <a href="{% url 'importFile' %}">匯入檔案</a>
+        <a href="{% url 'summary' %}">結果預覽</a>
+    </div>
+    <div id="header">
+        <h1><img src="/static/logo.png" width=10% height=10%>客林存貨預測系統</h1>
+    </div>
+    <div id="instruction">
+        使用方法：
+        <br> (1) 進入「設定檔」頁面，建立設定檔（若已建立則不需要）
+        <br> (2) 進入「選擇設定檔」頁面，選擇欲使用之設定檔（預設為全部方法）
+        <br> (3) 進入「匯入檔案」頁面，匯入檔案，進行預測
+        <br> (4) 進入「結果預覽」頁面，預覽預測結果，下載檔案
+    </div>
+
+</body>
